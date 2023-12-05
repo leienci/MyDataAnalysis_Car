@@ -1,5 +1,6 @@
 import requests
 import parsel
+import csv
 
 # 请求头
 headers = {
@@ -11,6 +12,10 @@ url = 'https://www.che168.com/xiamen/list/#pvareaid=100943'
 response = requests.get(url=url, headers=headers)
 data_html = response.text
 # print(data_html)
+
+# 保存数据到csv
+csv_che168 = open('che168.csv', mode='a', encoding='utf-8', newline='')
+csv_writer = csv.writer(csv_che168)
 
 # 筛选数据
 selector = parsel.Selector(data_html)
@@ -28,5 +33,7 @@ for li in lis:
         carinfo = li.css('.carinfo::attr(href)').get()
         img = li.css('img::attr(src)').get()
         print(name, kmNum, years, city, business, price, yprice)
+        # 保存数据
+        csv_writer.writerow([name, kmNum, years, city, business, price, yprice])
     except:
         pass
