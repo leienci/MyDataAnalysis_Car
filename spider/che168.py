@@ -10,9 +10,9 @@ from selenium.webdriver.common.by import By
 
 # 设置chromium可执行文件和chromedriver.exe驱动路径
 options = webdriver.ChromeOptions()
-options.binary_location = 'C:\Soft_Green\Win_x64_1147503_chrome-win\chrome-win\chrome.exe'
-driver_path = 'C:\Soft_Green\Win_x64_1147503_chrome-win\chromedriver.exe'
-driver = webdriver.Chrome(executable_path=driver_path, chrome_options=options)
+options.binary_location = '../chromedriver/chrome-win/chrome.exe'
+driver_path = '../chromedriver/chromedriver.exe'
+browser = webdriver.Chrome(executable_path=driver_path, options=options)
 
 # 请求头
 headers = {
@@ -22,34 +22,33 @@ headers = {
 
 url = f'https://www.che168.com/dealer/548474/49448172.html?pvareaid=100519&userpid=350000&usercid=350200&offertype=&offertag=0&activitycartype=0&adid=7943329&cpctype=2&encryptinfo=N+my3hCINo0UEl15ojX3tqO5uLsUAPAMuZ06U4JUIgU=&cartype=72&queryid=1701773006$0$45329946-82E7-4DE5-81F5-BEE572308660$45040$1&platform=0&position=0&fromsxmlist=0#pos=2#page=1#rtype=10#isrecom=10#filter=29#module=10#refreshid=0#recomid=0#queryid=1701773006$0$45329946-82E7-4DE5-81F5-BEE572308660$45040$1#cartype=72'
 
+# 接收请求响应文件
+response = requests.get(url=url, headers=headers)
+data_html = response.text
+# print(data_html)
 
-driver.get(url)
-
-# 勾选用户协议
-driver.find_element(By.XPATH, '//*[@id="a_moreconfig"]').click()
-
-
-# # 接收请求响应文件
-# response = requests.get(url=url, headers=headers)
-# data_html = response.text
-# # print(data_html)
-#
-# # 筛选数据
-# selector = parsel.Selector(data_html)
-# gearbox = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[3]/text()').get()  # 变速箱
-# emission = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[4]/text()').get()  # 排放标准
-# displacement = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[5]/text()').get()  # 排量
-# release = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[6]/text()').get()  # 发布时间
-# annual = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[1]/text()').get()  # 年检到期
-# expiration = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[2]/text()').get()  # 保险到期
-# transfers = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[5]/text()').get()  # 过户次数
-# engine = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[1]/text()').get()  # 发动机
-# vehicle = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[2]/text()').get()  # 车辆级别
-# fuel = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[4]/text()').get()  # 燃油标号
-# drive = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[5]/text()').get()  # 驱动方式
-# link_more = selector.xpath('//*[@id="a_moreconfig"]').get()  # 更多
-#
-# print(gearbox, emission, displacement, release, annual, expiration, transfers, engine, vehicle, fuel, drive, link_more)
+# 筛选数据
+selector = parsel.Selector(data_html)
+gearbox = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[3]/text()').get()  # 变速箱
+emission = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[4]/text()').get()  # 排放标准
+displacement = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[5]/text()').get()  # 排量
+release = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[6]/text()').get()  # 发布时间
+annual = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[1]/text()').get()  # 年检到期
+expiration = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[2]/text()').get()  # 保险到期
+transfers = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[5]/text()').get()  # 过户次数
+engine = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[1]/text()').get()  # 发动机
+vehicle = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[2]/text()').get()  # 车辆级别
+fuel = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[4]/text()').get()  # 燃油标号
+drive = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[5]/text()').get()  # 驱动方式
+# 使用selenium获取全部参数链接
+browser.get(url)
+browser.find_element(By.XPATH, '//*[@id="a_moreconfig"]').click()  # 点击全部参数配置
+browser.switch_to.window(browser.window_handles[1])  # 切换到新打开的选项卡
+browser.close()  # 关闭新选项卡
+browser.switch_to.window(browser.window_handles[0])  # 切换回初始选项卡
+link_more = browser.find_element(By.XPATH, '//*[@id="a_moreconfig"]').get_attribute('href')
+browser.quit()  # 退出浏览器
+print(gearbox, emission, displacement, release, annual, expiration, transfers, engine, vehicle, fuel, drive, link_more)
 
 # # 保存数据到csv
 # csv_che168 = open('che168.csv', mode='a', encoding='utf-8', newline='')
