@@ -37,16 +37,19 @@ def Spider_car_info(carinfo):
     release = selector.xpath('//*[@id="nav1"]/div[1]/ul[1]/li[6]/text()').get()  # 发布时间
     annual = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[1]/text()').get()  # 年检到期
     expiration = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[2]/text()').get()  # 保险到期
-    transfers = selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[5]/text()').get()  # 过户次数
+    transfers = (selector.xpath('//*[@id="nav1"]/div[1]/ul[2]/li[5]/text()').get()
+                 .replace("次（以车辆登记证为准）", ""))  # 过户次数
     engine = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[1]/text()').get()  # 发动机
+    horsepower = engine.split(' ')[1].replace("马力", "")  # 马力
+    cylinder = engine.split(' ')[2]  # 气缸类型
     vehicle = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[2]/text()').get()  # 车辆级别
     fuel = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[4]/text()').get()  # 燃油标号
     drive = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[5]/text()').get()  # 驱动方式
-    brand = selector.xpath('/html/body/div[4]/a[4]/text()').get()  # 驱动方式
+    brand = selector.xpath('/html/body/div[4]/a[4]/text()').get().replace("二手", "")  # 品牌
 
     # print(gearbox, emission, displacement, release, annual, expiration, transfers, engine, vehicle, fuel, drive)
     return (gearbox, emission, displacement, release, annual, expiration,
-            transfers, engine, vehicle, fuel, drive, brand)
+            transfers, horsepower, cylinder, vehicle, fuel, drive, brand)
 
 
 def main():
@@ -66,23 +69,24 @@ def main():
             try:
                 name = li.css('.card-name::text').get()  # 车名
                 unit = li.css('.cards-unit::text').get()  # 信息
-                kmNum = unit.split('／')[0]  # 里程数
+                kmNum = unit.split('／')[0].replace("万公里", "")  # 里程数
                 years = unit.split('／')[1]  # 年份
                 city = unit.split('／')[2]  # 城市
-                business = unit.split('／')[3]  # 商家
+                # business = unit.split('／')[3]  # 商家
                 price = li.css('.pirce em::text').get()  # 售价
-                yprice = li.css('s::text').get()  # 原价
+                yprice = li.css('s::text').get().replace("万", "")  # 原价
                 carinfo = li.css('.carinfo::attr(href)').get()
                 # img = li.css('img::attr(src)').get()
-                print(name, kmNum, years, city, business, price, yprice)
                 info = Spider_car_info(carinfo)
+                print(name, kmNum, years, city, price, yprice)
                 print(info)
                 # 保存数据
-                csv_writer.writerow([name, kmNum, years, city, business, price, yprice])
+                csv_writer.writerow([name, kmNum, years, city, price, yprice])
+                print('爬取成功')
             except:
+                print('爬取失败')
                 pass
-            print('\n')
-            time.sleep(random.randint(5, 9))
+            time.sleep(random.randint(3, 7))
 
 
 if __name__ == '__main__':
