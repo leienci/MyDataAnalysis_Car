@@ -8,13 +8,10 @@ import csv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-# 设置chromium可执行文件和chromedriver.exe驱动路径
-options = webdriver.ChromeOptions()
-options.binary_location = '../chromedriver/chrome-win/chrome.exe'
-driver_path = '../chromedriver/chromedriver.exe'
-browser = webdriver.Chrome(executable_path=driver_path, options=options)
-
 # 保存数据到csv
+data = [
+    ['车名', '里程数', '年份', '城市', '商家', '售价', '原价', '公司规模']
+]
 csv_che168 = open('che168.csv', mode='a', encoding='utf-8', newline='')
 csv_writer = csv.writer(csv_che168)
 
@@ -25,17 +22,7 @@ headers = {
 }
 
 
-def Spider_car_more(link):
-    # 使用selenium获取全部参数链接
-    browser.get(link)
-    browser.find_element(By.XPATH, '//*[@id="a_moreconfig"]').click()  # 点击全部参数配置
-    browser.switch_to.window(browser.window_handles[1])  # 切换到新打开的选项卡
-    browser.close()  # 关闭新选项卡
-    browser.switch_to.window(browser.window_handles[0])  # 切换回初始选项卡
-    link_more = browser.find_element(By.XPATH, '//*[@id="a_moreconfig"]').get_attribute('href')
-    print(link_more)
-
-
+# 爬取车辆信息
 def Spider_car_info(carinfo):
     # 拼接完整链接
     link = f'https://www.che168.com/{carinfo}'
@@ -55,12 +42,15 @@ def Spider_car_info(carinfo):
     vehicle = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[2]/text()').get()  # 车辆级别
     fuel = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[4]/text()').get()  # 燃油标号
     drive = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[5]/text()').get()  # 驱动方式
-    print(gearbox, emission, displacement, release, annual, expiration, transfers, engine, vehicle, fuel, drive)
-    Spider_car_more(link)
+    brand = selector.xpath('/html/body/div[4]/a[4]/text()').get()  # 驱动方式
+
+    # print(gearbox, emission, displacement, release, annual, expiration, transfers, engine, vehicle, fuel, drive)
+    return (gearbox, emission, displacement, release, annual, expiration,
+            transfers, engine, vehicle, fuel, drive, brand)
 
 
-# 循环翻页
 def main():
+    # 循环翻页
     for page in range(1, 66):
         url = f'https://www.che168.com/xiamen/a0_0msdgscncgpi1ltocsp{page}exx0/'
         print(f'正在爬取第{page}页')
@@ -76,23 +66,23 @@ def main():
             try:
                 name = li.css('.card-name::text').get()  # 车名
                 unit = li.css('.cards-unit::text').get()  # 信息
-                kmNum = unit.split('／')[0]
-                years = unit.split('／')[1]
-                city = unit.split('／')[2]
-                business = unit.split('／')[3]
+                kmNum = unit.split('／')[0]  # 里程数
+                years = unit.split('／')[1]  # 年份
+                city = unit.split('／')[2]  # 城市
+                business = unit.split('／')[3]  # 商家
                 price = li.css('.pirce em::text').get()  # 售价
                 yprice = li.css('s::text').get()  # 原价
                 carinfo = li.css('.carinfo::attr(href)').get()
                 # img = li.css('img::attr(src)').get()
                 print(name, kmNum, years, city, business, price, yprice)
-                Spider_car_info(carinfo)
+                info = Spider_car_info(carinfo)
+                print(info)
                 # 保存数据
-                # csv_writer.writerow([name, kmNum, years, city, business, price, yprice])
+                csv_writer.writerow([name, kmNum, years, city, business, price, yprice])
             except:
                 pass
-            print('-----------------------------------------------------')
+            print('\n')
             time.sleep(random.randint(5, 9))
-        # time.sleep(random.randint(3, 5))
 
 
 if __name__ == '__main__':
