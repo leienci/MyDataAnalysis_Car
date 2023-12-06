@@ -1,6 +1,7 @@
 import random
 import time
 import csv
+import threading
 
 import requests
 import parsel
@@ -48,45 +49,53 @@ def Spider_car_info(carinfo):
             transfers, horsepower, cylinder, vehicle, fuel, drive, brand)
 
 
+def Spider_car(page):
+    url = f'https://www.che168.com/fujian/a0_0msdgscncgpi1ltocsp{page}exx0/?pvareaid=102179#currengpostion/'
+    # 接收请求响应文件
+    response = requests.get(url=url, headers=headers)
+    data_html = response.text
+    # print(data_html)
+
+    # 筛选数据
+    selector = parsel.Selector(data_html)
+    lis = selector.css('.viewlist_ul li')
+    tag = 0
+    for li in lis:
+        try:
+            name = li.css('.card-name::text').get()  # 车名
+            unit = li.css('.cards-unit::text').get()  # 信息
+            km = unit.split('／')[0].replace("万公里", "")  # 里程数
+            years = unit.split('／')[1]  # 年份
+            city = unit.split('／')[2]  # 城市
+            # business = unit.split('／')[3]  # 商家
+            sale = li.css('.pirce em::text').get()  # 售价
+            price = li.css('s::text').get().replace("万", "")  # 原价
+            links = li.css('.carinfo::attr(href)').get()  # 车辆链接
+            # img = li.css('img::attr(src)').get()
+            info = Spider_car_info(links)
+            print(name, km, years, city, sale, price)
+            print(info)
+            # 保存数据
+            (gearbox, emission, displacement, release, annual, expiration,
+             transfers, horsepower, cylinder, vehicle, fuel, drive, brand) = info
+            csv_writer.writerow([name, km, years, city, sale, price, gearbox, emission, displacement,
+                                 release, annual, expiration, transfers, horsepower, cylinder, vehicle,
+                                 fuel, drive, brand])
+            tag = tag + 1
+            print('爬取成功^_^')
+            print(f'第{page}页，已经成功爬取{tag}辆')
+        except:
+            print('爬取失败QaQ')
+            pass
+        time.sleep(random.randint(1, 7))
+
+
 def main():
     # 循环翻页
     for page in range(1, 101):
-        url = f'https://www.che168.com/fujian/a0_0msdgscncgpi1ltocsp{page}exx0/?pvareaid=102179#currengpostion/'
-        print(f'正在爬取第{page}页')
-        # 接收请求响应文件
-        response = requests.get(url=url, headers=headers)
-        data_html = response.text
-        # print(data_html)
-
-        # 筛选数据
-        selector = parsel.Selector(data_html)
-        lis = selector.css('.viewlist_ul li')
-        for li in lis:
-            try:
-                name = li.css('.card-name::text').get()  # 车名
-                unit = li.css('.cards-unit::text').get()  # 信息
-                km = unit.split('／')[0].replace("万公里", "")  # 里程数
-                years = unit.split('／')[1]  # 年份
-                city = unit.split('／')[2]  # 城市
-                # business = unit.split('／')[3]  # 商家
-                sale = li.css('.pirce em::text').get()  # 售价
-                price = li.css('s::text').get().replace("万", "")  # 原价
-                links = li.css('.carinfo::attr(href)').get()  # 车辆链接
-                # img = li.css('img::attr(src)').get()
-                info = Spider_car_info(links)
-                print(name, km, years, city, sale, price)
-                print(info)
-                # 保存数据
-                (gearbox, emission, displacement, release, annual, expiration,
-                 transfers,horsepower, cylinder, vehicle, fuel, drive, brand) = info
-                csv_writer.writerow([name, km, years, city, sale, price, gearbox, emission, displacement,
-                                     release, annual, expiration, transfers, horsepower, cylinder, vehicle,
-                                     fuel, drive, brand])
-                print('爬取成功^_^')
-            except:
-                print('爬取失败QaQ')
-                pass
-            time.sleep(random.randint(3, 7))
+        print(f'正在爬取第{page}页...')
+        Spider_car(page)
+        print(f'第{page}页爬取完成')
 
 
 if __name__ == '__main__':
