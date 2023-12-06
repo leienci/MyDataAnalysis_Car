@@ -1,17 +1,11 @@
 import random
 import time
+import csv
 
 import requests
 import parsel
-import csv
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 
 # 保存数据到csv
-data = [
-    ['车名', '里程数', '年份', '城市', '商家', '售价', '原价', '公司规模']
-]
 csv_che168 = open('che168.csv', mode='a', encoding='utf-8', newline='')
 csv_writer = csv.writer(csv_che168)
 
@@ -43,19 +37,21 @@ def Spider_car_info(carinfo):
     horsepower = engine.split(' ')[1].replace("马力", "")  # 马力
     cylinder = engine.split(' ')[2]  # 气缸类型
     vehicle = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[2]/text()').get()  # 车辆级别
-    fuel = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[4]/text()').get()  # 燃油标号
+    fuel = (selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[4]/text()').get()
+            .replace("号", ""))  # 燃油标号
     drive = selector.xpath('//*[@id="nav1"]/div[1]/ul[3]/li[5]/text()').get()  # 驱动方式
     brand = selector.xpath('/html/body/div[4]/a[4]/text()').get().replace("二手", "")  # 品牌
-
-    # print(gearbox, emission, displacement, release, annual, expiration, transfers, engine, vehicle, fuel, drive)
+    # print(gearbox, emission, displacement, release, annual,
+    #       expiration, transfers, engine, vehicle, fuel, drive)
+    # 返回详情信息
     return (gearbox, emission, displacement, release, annual, expiration,
             transfers, horsepower, cylinder, vehicle, fuel, drive, brand)
 
 
 def main():
     # 循环翻页
-    for page in range(1, 66):
-        url = f'https://www.che168.com/xiamen/a0_0msdgscncgpi1ltocsp{page}exx0/'
+    for page in range(1, 101):
+        url = f'https://www.che168.com/fujian/a0_0msdgscncgpi1ltocsp{page}exx0/?pvareaid=102179#currengpostion/'
         print(f'正在爬取第{page}页')
         # 接收请求响应文件
         response = requests.get(url=url, headers=headers)
@@ -69,22 +65,26 @@ def main():
             try:
                 name = li.css('.card-name::text').get()  # 车名
                 unit = li.css('.cards-unit::text').get()  # 信息
-                kmNum = unit.split('／')[0].replace("万公里", "")  # 里程数
+                km = unit.split('／')[0].replace("万公里", "")  # 里程数
                 years = unit.split('／')[1]  # 年份
                 city = unit.split('／')[2]  # 城市
                 # business = unit.split('／')[3]  # 商家
-                price = li.css('.pirce em::text').get()  # 售价
-                yprice = li.css('s::text').get().replace("万", "")  # 原价
-                carinfo = li.css('.carinfo::attr(href)').get()
+                sale = li.css('.pirce em::text').get()  # 售价
+                price = li.css('s::text').get().replace("万", "")  # 原价
+                links = li.css('.carinfo::attr(href)').get()  # 车辆链接
                 # img = li.css('img::attr(src)').get()
-                info = Spider_car_info(carinfo)
-                print(name, kmNum, years, city, price, yprice)
+                info = Spider_car_info(links)
+                print(name, km, years, city, sale, price)
                 print(info)
                 # 保存数据
-                csv_writer.writerow([name, kmNum, years, city, price, yprice])
-                print('爬取成功')
+                (gearbox, emission, displacement, release, annual, expiration,
+                 transfers,horsepower, cylinder, vehicle, fuel, drive, brand) = info
+                csv_writer.writerow([name, km, years, city, sale, price, gearbox, emission, displacement,
+                                     release, annual, expiration, transfers, horsepower, cylinder, vehicle,
+                                     fuel, drive, brand])
+                print('爬取成功^_^')
             except:
-                print('爬取失败')
+                print('爬取失败QaQ')
                 pass
             time.sleep(random.randint(3, 7))
 
