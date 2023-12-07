@@ -60,6 +60,7 @@ def Spider_car(page):
     selector = parsel.Selector(data_html)
     lis = selector.css('.viewlist_ul li')
     tag = 0
+    fail = 0
     for li in lis:
         try:
             name = li.css('.card-name::text').get()  # 车名
@@ -83,10 +84,11 @@ def Spider_car(page):
                                  fuel, drive, brand])
             tag = tag + 1
             print('爬取成功^_^')
-            print(f'第{page}页，已经成功爬取{tag}辆')
         except:
+            fail = fail + 1
             print('爬取失败QaQ')
             pass
+        print(f'第{page}页，爬取成功{tag}辆，爬取失败{fail}辆')
         time.sleep(random.randint(1, 7))
 
 
