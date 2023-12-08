@@ -64,12 +64,12 @@ def Spider_car(page, index):
     # 筛选数据
     selector = parsel.Selector(data_html)
     lis = selector.css('.viewlist_ul li')
-
+    # 每页的成功失败统计
     tag = 0
     fail = 0
     for begin in range(index, len(lis)):
         li = lis[begin]
-        print(f'当前下标为{begin}')
+        print(f'当前下标为{begin}/{len(lis)}')
         try:
             name = li.css('.card-name::text').get()  # 车名
             unit = li.css('.cards-unit::text').get()  # 信息
@@ -117,8 +117,11 @@ def main():
         print("读取到进度文件，断点继续执行")
         config.read('config.ini')  # 读取INI文件
         start = int(config.get('progress', 'page'))  # 读取爬取页数
+        # 读取到进度文件，从下个下标（下辆车）开始爬取
         index = int(config.get('progress', 'index')) + 1  # 读取爬取页数
+
     else:
+        # 未读取到进度文件，从头开始爬取
         start = 1
         index = 0
 
@@ -127,6 +130,7 @@ def main():
         print(f'正在爬取第{page}页...')
         Spider_car(page, index)
         print(f'第{page}页爬取完成')
+        # 重置车辆下标
         index = 0
 
 
