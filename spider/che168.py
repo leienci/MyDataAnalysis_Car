@@ -1,10 +1,15 @@
+import os
 import random
 import time
 import csv
-import threading
+import configparser
 
 import requests
 import parsel
+
+# 保存爬取进度
+ini_file_path = 'config.ini'
+config = configparser.ConfigParser()
 
 # 保存数据到csv
 csv_che168 = open('che168.csv', mode='a', encoding='utf-8', newline='')
@@ -50,6 +55,7 @@ def Spider_car_info(carinfo):
 
 
 def Spider_car(page):
+    global index
     url = f'https://www.che168.com/fujian/a0_0msdgscncgpi1ltocsp{page}exx0/?pvareaid=102179#currengpostion/'
     # 接收请求响应文件
     response = requests.get(url=url, headers=headers)
@@ -59,9 +65,16 @@ def Spider_car(page):
     # 筛选数据
     selector = parsel.Selector(data_html)
     lis = selector.css('.viewlist_ul li')
+
+    if os.path.isfile(ini_file_path):
+        config.read('config.ini')  # 读取INI文件
+        index = int(config.get('progress', 'index')) + 1  # 读取爬取页数
+    else:
+        index = 0
     tag = 0
     fail = 0
-    for li in lis:
+    for begin in range(index, len(lis)):
+        li = lis[begin]
         try:
             name = li.css('.card-name::text').get()  # 车名
             unit = li.css('.cards-unit::text').get()  # 信息
@@ -88,15 +101,40 @@ def Spider_car(page):
             fail = fail + 1
             print('爬取失败QaQ')
             pass
-        print(f'第{page}页，爬取成功{tag}辆，爬取失败{fail}辆')
+        print(f'第{page}页。爬取成功{tag}辆，爬取失败{fail}辆')
+        # 添加配置值
+        config['progress'] = {
+            'page': str(page),
+            'index': str(begin)
+        }
+        # 写入INI文件
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
         time.sleep(random.randint(1, 7))
 
 
 def main():
+    global start
+    # 读取爬取进度
+    # 判断INI文件是否存在
+    if os.path.isfile(ini_file_path):
+        print("读取到进度文件，断点继续执行")
+        config.read('config.ini')  # 读取INI文件
+        start = int(config.get('progress', 'page'))  # 读取爬取页数
+    else:
+        start = 1
+
     # 循环翻页
-    for page in range(1, 101):
+    for page in range(start, 101):
         print(f'正在爬取第{page}页...')
         Spider_car(page)
+        # 重置车辆进度
+        config['progress'] = {
+            'index': '-1'
+            #  第二次循环读取到进度文件，进度从-1开始
+        }
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
         print(f'第{page}页爬取完成')
 
 
