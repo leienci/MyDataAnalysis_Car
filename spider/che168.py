@@ -54,8 +54,7 @@ def Spider_car_info(carinfo):
             transfers, horsepower, cylinder, vehicle, fuel, drive, brand)
 
 
-def Spider_car(page):
-    global index
+def Spider_car(page, index):
     url = f'https://www.che168.com/fujian/a0_0msdgscncgpi1ltocsp{page}exx0/?pvareaid=102179#currengpostion/'
     # 接收请求响应文件
     response = requests.get(url=url, headers=headers)
@@ -66,15 +65,11 @@ def Spider_car(page):
     selector = parsel.Selector(data_html)
     lis = selector.css('.viewlist_ul li')
 
-    if os.path.isfile(ini_file_path):
-        config.read('config.ini')  # 读取INI文件
-        index = int(config.get('progress', 'index')) + 1  # 读取爬取页数
-    else:
-        index = 0
     tag = 0
     fail = 0
     for begin in range(index, len(lis)):
         li = lis[begin]
+        print(f'当前下标为{begin}')
         try:
             name = li.css('.card-name::text').get()  # 车名
             unit = li.css('.cards-unit::text').get()  # 信息
@@ -115,27 +110,24 @@ def Spider_car(page):
 
 def main():
     global start
+    global index
     # 读取爬取进度
     # 判断INI文件是否存在
     if os.path.isfile(ini_file_path):
         print("读取到进度文件，断点继续执行")
         config.read('config.ini')  # 读取INI文件
         start = int(config.get('progress', 'page'))  # 读取爬取页数
+        index = int(config.get('progress', 'index')) + 1  # 读取爬取页数
     else:
         start = 1
+        index = 0
 
     # 循环翻页
     for page in range(start, 101):
         print(f'正在爬取第{page}页...')
-        Spider_car(page)
-        # 重置车辆进度
-        config['progress'] = {
-            'index': '-1'
-            #  第二次循环读取到进度文件，进度从-1开始
-        }
-        with open('config.ini', 'w') as configfile:
-            config.write(configfile)
+        Spider_car(page, index)
         print(f'第{page}页爬取完成')
+        index = 0
 
 
 if __name__ == '__main__':
