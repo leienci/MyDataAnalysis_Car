@@ -12,7 +12,7 @@ ini_file_path = 'config.ini'
 config = configparser.ConfigParser()
 
 # 保存数据到csv
-csv_che168 = open('che168.csv', mode='a', encoding='utf-8', newline='')
+csv_che168 = open('che168.csv', mode='a', encoding='utf-8', newline='')  # UTF-8编码，追加写入模式
 csv_writer = csv.writer(csv_che168)
 
 # 请求头
