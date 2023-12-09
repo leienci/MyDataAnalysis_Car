@@ -12,7 +12,7 @@ ini_file_path = 'config.ini'
 config = configparser.ConfigParser()
 
 # 保存数据到csv
-csv_che168 = open('che168_fujian.csv', mode='a', encoding='utf-8', newline='')  # UTF-8编码，追加写入模式
+csv_che168 = open('che168_ningde.csv', mode='a', encoding='utf-8', newline='')  # UTF-8编码，追加写入模式
 csv_writer = csv.writer(csv_che168)
 
 # 请求头
@@ -55,7 +55,7 @@ def Spider_car_info(carinfo):
 
 
 def Spider_car(page, index):
-    url = f'https://www.che168.com/fujian/a0_0msdgscncgpi1ltocsp{page}exx0/?pvareaid=102179#currengpostion/'
+    url = f'https://www.che168.com/ningde/a0_0msdgscncgpi1ltocsp{page}exx0/?pvareaid=102179#currengpostion/'
     # 接收请求响应文件
     response = requests.get(url=url, headers=headers)
     data_html = response.text
@@ -126,12 +126,19 @@ def main():
         index = 0
 
     # 循环翻页
-    for page in range(start, 101):
+    # 默认开始页数1，结束页数需要+1
+    for page in range(start, 2 + 1):
         print(f'正在爬取第{page}页...')
         Spider_car(page, index)
         print(f'第{page}页爬取完成')
         # 重置车辆下标
         index = 0
+
+    # 爬取完成
+    print('爬取完成！！')
+    if os.path.isfile(ini_file_path):
+        print("进度文件删除")
+        os.remove(ini_file_path)
 
 
 if __name__ == '__main__':
