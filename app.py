@@ -7,23 +7,28 @@ import sqlite3
 app = Flask(__name__)
 
 
-@app.route('/')
-def index():  # put application's code here
+@app.route('/index')
+def home():
     # 连接数据库
     conn = sqlite3.connect('che168.db')
     cursor = conn.cursor()
     # 查询数据库中车的数量
     cursor.execute('SELECT COUNT(*) FROM che168')
     result = cursor.fetchone()[0]
-    print("二手车数量:", result)
+    # 车辆级别的数量
+    cursor.execute('SELECT COUNT(DISTINCT 车辆级别) FROM che168')
+    level = cursor.fetchone()[0]
+    # 品牌的数量
+    cursor.execute('SELECT COUNT(DISTINCT 品牌) FROM che168')
+    brand = cursor.fetchone()[0]
+    # 城市的数量
+    cursor.execute('SELECT COUNT(DISTINCT 城市) FROM che168')
+    city = cursor.fetchone()[0]
+
+    print("二手车数量:", result, "车辆级别:", level, "品牌:", brand, "城市:", city)
     # 关闭数据库连接
     conn.close()
-    return render_template("index.html", vehicles=result)
-
-
-@app.route('/index')
-def home():
-    return render_template('index.html')
+    return render_template("index.html", vehicles=result, level=level, brand=brand, city=city)
 
 
 @app.route('/car')
