@@ -1,0 +1,21 @@
+from flask import request
+from flask import Flask
+from flask import render_template
+
+import sqlite3
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def index():  # put application's code here
+    return render_template("index.html")
+
+
+@app.route('/index')
+def home():
+    return render_template('index.html')
+
+
+if __name__ == '__main__':
+    app.run()
