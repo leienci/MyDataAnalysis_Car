@@ -1,4 +1,4 @@
-from flask import request, send_file
+from flask import request, send_file, jsonify
 from flask import Flask
 from flask import render_template
 from wordcloud import WordCloud
@@ -185,6 +185,34 @@ def emission():
     cur.close()
     con.close()
     return render_template('emission.html', emission=emission, num=num)
+
+
+# 价格折线图
+@app.route('/get_price_data')
+def get_price_data():
+    # 连接到 SQLite 数据库
+    conn = sqlite3.connect('che168.db')
+    cursor = conn.cursor()
+
+    # 执行查询并统计不同价格区间车辆的数量
+    sql = "SELECT CASE WHEN 售价 BETWEEN 0 AND 1 THEN '0-1' WHEN 售价 BETWEEN 1 AND 10 THEN '1-10' WHEN 售价 BETWEEN 11 AND 20 THEN '11-20' WHEN 售价 BETWEEN 21 AND 30 THEN '21-30' WHEN 售价 BETWEEN 31 AND 50 THEN '31-50' WHEN 售价 BETWEEN 51 AND 70 THEN '51-70' WHEN 售价 BETWEEN 71 AND 98 THEN '71-99' ELSE '100+' END AS 价格区间, COUNT(*) AS 数量 FROM che168 WHERE 售价 IS NOT NULL GROUP BY 价格区间 ORDER BY MIN(售价)"
+    data = cursor.execute(sql).fetchall()
+
+    # 关闭连接
+    conn.close()
+
+    # 处理数据，准备绘图所需的格式
+    price_ranges = [item[0] for item in data]
+    quantities = [item[1] for item in data]
+
+    # 将数据转换为 JSON 格式并返回
+    return jsonify({'price_ranges': price_ranges, 'quantities': quantities})
+
+
+# 定义一个路由，用于显示包含 ECharts 的页面
+@app.route('/price')
+def price():
+    return render_template('price.html')
 
 
 if __name__ == '__main__':

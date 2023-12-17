@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>排放</title>
+    <title>售价</title>
     <meta content="" name="descriptison">
     <meta content="" name="keywords">
 
@@ -51,8 +51,8 @@
                 <li><a href="/city">城市</a></li>
                 <li><a href="/brand">品牌</a></li>
                 <li><a href="/gearbox">变速箱</a></li>
-                <li class="active"><a href="/emission">排放<i class="la la-angle-down"></i></a></li>
-                <li><a href="/price">售价</a></li>
+                <li><a href="/emission">排放</a></li>
+                <li class="active"><a href="/price">售价<i class="la la-angle-down"></i></a></li>
             </ul>
         </nav><!-- .nav-menu -->
     </div>
@@ -68,44 +68,63 @@
         </div>
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
-            <!-- 折线图容器 -->
-            <div id="chart" style="width: 100%; height: 500px;"></div>
+            <!-- 渲染图表的容器 -->
+            <div id="price-chart" style="width: 100%; height: 500px;"></div>
+
+            <!-- 在JavaScript中使用ECharts绘制图表 -->
             <script>
-                // 创建 ECharts 实例
-                var chart = echarts.init(document.getElementById('chart'));
+                // 发送 AJAX 请求获取数据
+                fetch('/get_price_data')
+                    .then(response => response.json())
+                    .then(data => {
+                        // 对价格区间进行排序，将 '99+' 移到最后
+                        data.price_ranges.sort((a, b) => {
+                            if (a === '99+') return 1;
+                            if (b === '99+') return -1;
+                            return parseInt(a) - parseInt(b);
+                        });
 
-                // 获取后端传递的数据
-                var emission = {{ emission|tojson }};
-                var num = {{ num|tojson }};
+                        // 使用ECharts绘制折线图
+                        var chart = echarts.init(document.getElementById('price-chart'));
 
-                // 定义标准条形图的配置项
-                var option = {
-                    title: {
-                        text: '排放统计条形图'
-                    },
-                    tooltip: {
-                        trigger: 'axis',  // 鼠标悬停触发方式
-                        formatter: '{b}: {c}'  // 鼠标悬停提示框的格式
-                    },
-                    xAxis: {
-                        type: 'value'
-                    },
-                    yAxis: {
-                        type: 'category',
-                        data: emission,
-                    },
-                    series: [{
-                        type: 'bar',
-                        data: num,
-                        label: {
-                            show: true, // 显示数值
-                            position: 'right' // 数值显示在条形内部
-                        }
-                    }]
-                };
+                        var option = {
+                            title: {
+                                text: '售价统计折线图'
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: data.price_ranges
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            tooltip: {  // 添加tooltip配置
+                                trigger: 'axis',
+                                axisPointer: {
+                                    type: 'cross',
+                                    crossStyle: {
+                                        color: '#999'
+                                    }
+                                }
+                            },
+                            series: [{
+                                data: data.quantities,
+                                type: 'line',
+                                label: {
+                                    show: true, // 显示数值
+                                    position: 'top' // 数值显示在条形内部
+                                },
+                                itemStyle: {  // 添加itemStyle配置
+                                    normal: {
+                                        color: 'skyblue'  // 折线颜色
+                                    }
+                                }
+                            }]
+                        };
 
-                // 使用配置项绘制标准条形图
-                chart.setOption(option);
+                        chart.setOption(option);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
             </script>
         </section><!-- End Counts Section -->
     </div>

@@ -52,6 +52,7 @@
                 <li><a href="/brand">品牌</a></li>
                 <li><a href="/gearbox">变速箱</a></li>
                 <li><a href="/emission">排放</a></li>
+                <li><a href="/price">售价</a></li>
             </ul>
         </nav><!-- .nav-menu -->
     </div>
@@ -120,7 +121,7 @@
     option = {
         color: ['#3398DB'],
         title: {
-            text: ''
+            text: '车辆级别统计柱状图'
         },
         tooltip: {
             trigger: 'axis',
@@ -150,9 +151,9 @@
                 type: 'bar',
                 barWidth: '60%',
                 label: {
-                            show: true, // 显示数值
-                            position: 'top' // 数值显示在条形内部
-                        }
+                    show: true, // 显示数值
+                    position: 'top' // 数值显示在条形内部
+                }
             }
         ]
     };
