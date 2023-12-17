@@ -110,6 +110,7 @@ def city():
     return render_template('city.html', city=city, num=num)
 
 
+# 生成品牌词云
 @app.route('/wordcloud')
 def wordcloud():
     # 连接数据库
@@ -143,9 +144,28 @@ def wordcloud():
         return str(e)
 
 
+# 品牌词云页面
 @app.route('/brand')
 def bard():
     return render_template('brand.html')
+
+
+@app.route('/gearbox')
+def gearbox():
+    gearbox = []  # 车辆变速箱
+    num = []  # 每一个等级对应的车辆数量
+    con = sqlite3.connect("che168.db")
+    cur = con.cursor()
+    # 查询每个城市的车辆数量
+    sql = "select 变速箱, count(变速箱) from che168 where 变速箱 != 'None' group by 变速箱"
+    data = cur.execute(sql)
+    for item in data:
+        gearbox.append(str(item[0]))
+        num.append(item[1])
+        print(gearbox, num)
+    cur.close()
+    con.close()
+    return render_template('gearbox.html', gearbox=gearbox, num=num)
 
 
 if __name__ == '__main__':

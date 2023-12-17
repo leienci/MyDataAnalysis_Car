@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>车辆级别</title>
+    <title>变速箱</title>
     <meta content="" name="descriptison">
     <meta content="" name="keywords">
 
@@ -47,14 +47,15 @@
             <ul>
                 <li><a href="/index">首页</a></li>
                 <li><a href="/car">二手车</a></li>
-                <li class="active"><a href="/level">车辆级别<i class="la la-angle-down"></i></a></li>
+                <li><a href="/level">车辆级别</a></li>
                 <li><a href="/city">城市</a></li>
                 <li><a href="/brand">品牌</a></li>
-                <li><a href="/gearbox">变速箱</a></li>
+                <li class="active"><a href="/gearbox">变速箱<i class="la la-angle-down"></i></a></li>
             </ul>
         </nav><!-- .nav-menu -->
     </div>
 </header><!-- End Header -->
+
 <!-- ======= Our Team Section ======= -->
 <section id="team" class="team">
     <div class="container">
@@ -63,22 +64,47 @@
             <h2>汽车之家二手车数据分析</h2>
             <p>应用Python爬虫/Flask框架/Echarts插件/WordCloud等技术实现</p>
         </div>
-
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
-            <!-- 创建一个具有指定 ID 的 DOM 元素作为图表的容器 -->
-            <div id="main" style="width: 100%;height:400px;"></div>
-            <!-- 在 JavaScript 中使用 Echarts 绘制图表 -->
+            <!-- 图表容器 -->
+            <div id="gearbox-chart" style="width: 100%; height: 500px;"></div>
             <script>
-                // 获取传递给模板的数据
-                var level = {{ level | tojson }};
-                var num = {{ num | tojson }};
+                // 获取从 Flask 传递过来的数据
+                var gearboxData = {{ gearbox|tojson }};
+                var numData = {{ num|tojson }};
 
-                // 创建图表实例
-                var chart = echarts.init(document.getElementById('chart'));
+                // 初始化图表容器
+                var chartContainer = document.getElementById('gearbox-chart');
+                var chart = echarts.init(chartContainer);
 
-                // 使用配置项显示图表
-                chart.setOption(option);
+                // 配置图表
+                var options = {
+                    title: {
+                        text: '变速箱分布图', // 图表标题
+                        left: 'center' // 标题位置
+                    },
+                    series: [{
+                        type: 'pie', // 图表类型为饼状图
+                        data: [],
+                        label: {
+                            formatter: '{b} ({d}%)' // 设置标签显示的格式为：变速箱名称 (百分比)
+                        }
+                    }],
+                    tooltip: {
+                        formatter: '{b}：<br/>{c}辆 ({d}%)' // 设置提示框显示的格式为：变速箱名称：<br/>数量辆 (百分比)
+                    }
+                };
+
+                // 根据数据动态生成图表配置
+                for (var i = 0; i < gearboxData.length; i++) {
+                    options.series[0].data.push({
+                        value: numData[i],
+                        name: gearboxData[i]
+                    });
+                }
+
+                // 渲染图表
+                chart.setOption(options);
             </script>
         </section><!-- End Counts Section -->
     </div>
@@ -87,9 +113,7 @@
 <!-- ======= Footer ======= -->
 <footer id="footer">
     <div class="container">
-        <div class="copyright">Copyright &copy; 2020.Company name All rights reserved.<a target="_blank"
-                                                                                         href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a>
-        </div>
+        <div class="copyright">Copyright &copy; 2020.Company name All rights reserved.</div>
         <div class="credits"></div>
     </div>
 </footer><!-- End Footer -->
@@ -111,48 +135,6 @@
 <!-- Template Main JS File -->
 <script src="static/assets/js/main.js"></script>
 
-<script type="text/javascript">
-    var chartDom = document.getElementById('main');
-    var myChart = echarts.init(chartDom);
-    var option;
-
-    option = {
-        color: ['#3398DB'],
-        title: {
-            text: ''
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'shadow',
-            }
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'category',
-            data: {{ level | tojson }},
-            axisLabel: {
-                rotate: 90, // 旋转角度，可以根据需要调整
-            }
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [
-            {
-                data: {{ num }},
-                type: 'bar',
-                barWidth: '60%'
-            }
-        ]
-    };
-    option && myChart.setOption(option);
-</script>
 </body>
 
 </html>
