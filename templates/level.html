@@ -27,6 +27,8 @@
 
     <!-- Template Main CSS File -->
     <link href="static/assets/css/style.css" rel="stylesheet">
+    <!-- 引入 Echarts 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
 
 </head>
 
@@ -60,81 +62,33 @@
             <h2>汽车之家二手车数据分析</h2>
             <p>应用Python爬虫/Flask框架/Echarts插件/WordCloud等技术实现</p>
         </div>
+
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
-            <div class="container table-responsive">
+            <!-- 创建一个具有指定 ID 的 DOM 元素作为图表的容器 -->
+            <div id="main" style="width: 100%;height:400px;"></div>
+            <!-- 在 JavaScript 中使用 Echarts 绘制图表 -->
+            <script>
+                // 获取传递给模板的数据
+                var level = {{ level | tojson }};
+                var num = {{ num | tojson }};
 
-                <table class="table text-nowrap">
-                    <tr class="text-center">
-                        <td>车辆名称</td>
-                        <td>里程数</td>
-                        <td>年份</td>
-                        <td>城市</td>
-                        <td>售价</td>
-                        <td>原价</td>
-                        <td>变速箱</td>
-                        <td>排放标准</td>
-                        <td>排量/续航</td>
-                    </tr>
-                    {% for car in cars %}
-                        <tr class="text-center">
-                            <td>{{ car[0]}}</td>
-                            <td>{{ car[1]}}</td>
-                            <td>{{ car[2]}}</td>
-                            <td>{{ car[3]}}</td>
-                            <td>{{ car[4]}}</td>
-                            <td>{{ car[5]}}</td>
-                            <td>{{ car[6]}}</td>
-                            <td>{{ car[7]}}</td>
-                            <td>{{ car[8]}}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
-                <nav aria-label="Page navigation" class="text-center d-flex justify-content-center">
-                    <ul class="pagination">
-                        {% if page > 1 %}
-                            <li class="page-item"><a class="page-link" href="?page=1&per_page={{ per_page }}">First</a>
-                            </li>
-                            <li class="page-item"><a class="page-link"
-                                                     href="?page={{ page-1 }}&per_page={{ per_page }}">Previous</a></li>
-                        {% endif %}
-
-                        {% if page > 3 %}
-                            <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-                        {% endif %}
-
-                        {% set start = 1 if page <= 7 else page - 7 %}
-                        {% set end = total_pages if page + 10 > total_pages else page + 10 %}
-
-                        {% for p in range(start, end + 1) %}
-                            <li class="page-item {% if p == page %}active{% endif %}">
-                                <a class="page-link" href="?page={{ p }}&per_page={{ per_page }}">{{ p }}</a>
-                            </li>
-                        {% endfor %}
-
-                        {% if page < total_pages-2 %}
-                            <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-                        {% endif %}
-
-                        {% if page < total_pages %}
-                            <li class="page-item"><a class="page-link"
-                                                     href="?page={{ page+1 }}&per_page={{ per_page }}">Next</a></li>
-                            <li class="page-item"><a class="page-link"
-                                                     href="?page={{ total_pages }}&per_page={{ per_page }}">Last</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
+                // 创建图表实例
+                var chart = echarts.init(document.getElementById('chart'));
+                
+                // 使用配置项显示图表
+                chart.setOption(option);
+            </script>
         </section><!-- End Counts Section -->
     </div>
 </section><!-- End Our Team Section -->
 
-
 <!-- ======= Footer ======= -->
 <footer id="footer">
     <div class="container">
-        <div class="copyright">Copyright &copy; 2020.Company name All rights reserved.</div>
+        <div class="copyright">Copyright &copy; 2020.Company name All rights reserved.<a target="_blank"
+                                                                                         href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a>
+        </div>
         <div class="credits"></div>
     </div>
 </footer><!-- End Footer -->
@@ -156,6 +110,48 @@
 <!-- Template Main JS File -->
 <script src="static/assets/js/main.js"></script>
 
+<script type="text/javascript">
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+        color: ['#3398DB'],
+        title: {
+            text: ''
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow',
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: {{ level | tojson }},
+            axisLabel: {
+                rotate: 90, // 旋转角度，可以根据需要调整
+            }
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                data: {{ num }},
+                type: 'bar',
+                barWidth: '60%'
+            }
+        ]
+    };
+    option && myChart.setOption(option);
+</script>
 </body>
 
 </html>
