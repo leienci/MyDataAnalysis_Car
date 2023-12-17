@@ -2,7 +2,6 @@ from flask import request
 from flask import Flask
 from flask import render_template
 
-import json
 import sqlite3
 
 app = Flask(__name__)
@@ -96,6 +95,11 @@ def level():
     cur.close()
     con.close()
     return render_template('level.html', level=level, num=num)
+
+
+@app.route('/city')
+def city():
+    return render_template('city.html')
 
 
 if __name__ == '__main__':

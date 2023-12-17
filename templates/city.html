@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>首页</title>
+    <title>车辆级别</title>
     <meta content="" name="descriptison">
     <meta content="" name="keywords">
 
@@ -27,6 +27,8 @@
 
     <!-- Template Main CSS File -->
     <link href="static/assets/css/style.css" rel="stylesheet">
+    <!-- 引入 Echarts 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
 
 </head>
 
@@ -43,10 +45,11 @@
 
         <nav class="nav-menu float-right d-none d-lg-block">
             <ul>
-                <li class="active"><a href="/index">首页<i class="la la-angle-down"></i></a></li>
+                <li><a href="/index">首页</a></li>
                 <li><a href="/car">二手车</a></li>
                 <li><a href="/level">车辆级别</a></li>
-                <li><a href="/city">城市</a></li>
+                <li class="active"><a href="/city">城市<i class="la la-angle-down"></i></a></li>
+                {#          <li><a href="/word">词云</a></li>#}
                 {#          <li><a href="/team">团队</a></li>#}
             </ul>
         </nav><!-- .nav-menu -->
@@ -62,49 +65,10 @@
         </div>
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
-            <div class="container">
 
-                <div class="row">
-
-                    <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up">
-                        <div class="count-box">
-                            <i class="icofont-simple-smile" style="color: #20b38e;"></i>
-                            <span data-toggle="counter-up">{{ vehicles }}</span>
-                            <p>二手车数量</p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up" data-aos-delay="200">
-                        <div class="count-box">
-                            <i class="icofont-document-folder" style="color: #c042ff;"></i>
-                            <span data-toggle="counter-up">{{ level }}</span>
-                            <p>车辆级别统计</p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up" data-aos-delay="400">
-                        <div class="count-box">
-                            <i class="icofont-live-support" style="color: #46d1ff;"></i>
-                            <span data-toggle="counter-up">{{ brand }}</span>
-                            <p>品牌统计</p>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up" data-aos-delay="600">
-                        <div class="count-box">
-                            <i class="icofont-users-alt-5" style="color: #ffb459;"></i>
-                            <span data-toggle="counter-up">5</span>
-                            <p>城市统计</p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
         </section><!-- End Counts Section -->
     </div>
 </section><!-- End Our Team Section -->
-
 
 <!-- ======= Footer ======= -->
 <footer id="footer">
