@@ -17,6 +17,7 @@ def plus(value, arg):
     return value + arg
 
 
+# 主页
 @app.route('/index')
 def home():
     # 连接数据库
@@ -41,6 +42,7 @@ def home():
     return render_template("index.html", vehicles=result, level=level, brand=brand, city=city)
 
 
+# 二手车页面
 @app.route('/car')
 def car():
     datalist = []
@@ -50,35 +52,26 @@ def car():
     data = cur.execute(sql)
     for item in data:
         datalist.append(item)
-
     page = int(request.args.get('page', 1))
     per_page = 50  # 每页显示数量
-
     # 计算偏移量
     offset = (page - 1) * per_page
-
     # 执行查询
     cur.execute(f"SELECT * FROM che168 LIMIT {per_page} OFFSET {offset}")
     data = cur.fetchall()
-
     # 获取总数据条数
     cur.execute("SELECT COUNT(*) FROM che168")
     total_count = cur.fetchone()[0]
-
     # 计算总页数
     total_pages = total_count // per_page + (1 if total_count % per_page > 0 else 0)
-
     # 关闭数据库连接
     cur.close()
     con.close()
 
     return render_template('car.html', cars=data, page=page, per_page=per_page, total_pages=total_pages)
 
-    # return render_template('car.html',movies = datalist,paginate=paginate)
-    # return render_template('car.html',cars = datalist)
-    # return render_template('car.html')
 
-
+# 车辆级别页面
 @app.route('/level')
 def level():
     level = []  # 车辆等级
@@ -91,15 +84,28 @@ def level():
         level.append(str(item[0]))
         num.append(item[1])
         print(level, num)
-
     cur.close()
     con.close()
     return render_template('level.html', level=level, num=num)
 
 
+# 城市页面
 @app.route('/city')
 def city():
-    return render_template('city.html')
+    city = []  # 车辆等级
+    num = []  # 每一个等级对应的车辆数量
+    con = sqlite3.connect("che168.db")
+    cur = con.cursor()
+    # 查询每个城市的车辆数量
+    sql = "select 城市, count(城市) from che168 where 城市 != 'None' group by 城市"
+    data = cur.execute(sql)
+    for item in data:
+        city.append(str(item[0]))
+        num.append(item[1])
+        print(city, num)
+    cur.close()
+    con.close()
+    return render_template('city.html', city=city, num=num)
 
 
 if __name__ == '__main__':
