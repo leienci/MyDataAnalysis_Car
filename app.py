@@ -1,7 +1,9 @@
-from flask import request
+from flask import request, send_file
 from flask import Flask
 from flask import render_template
+from wordcloud import WordCloud
 
+import io
 import sqlite3
 
 app = Flask(__name__)
@@ -106,6 +108,46 @@ def city():
     cur.close()
     con.close()
     return render_template('city.html', city=city, num=num)
+
+
+@app.route('/wordcloud')
+def wordcloud():
+    # 连接数据库
+    conn = sqlite3.connect('che168.db')
+    try:
+        # 创建游标
+        cursor = conn.cursor()
+        # 执行查询
+        cursor.execute("SELECT 品牌 FROM che168")
+        results = cursor.fetchall()
+        # 提取品牌名称列表
+        brand_names = [result[0] for result in results]
+        # 将品牌名称转换为字符串
+        text = ' '.join(brand_names)
+        # 设置中文字体路径
+        font_path = './YouSheBiaoTiHei-2.ttf'
+        # 创建词云对象，并指定字体路径
+        wordcloud = WordCloud(width=1100, height=500, background_color='white', font_path=font_path).generate(text)
+        # 生成词云图像
+        image = wordcloud.to_image()
+        # 将图像保存为字节流
+        img_byte = io.BytesIO()
+        image.save(img_byte, format='PNG')
+        img_byte.seek(0)
+        print('词云生成成功^_^')
+        # 关闭数据库连接
+        conn.close()
+        # 返回词云图像
+        return send_file(img_byte, mimetype='image/png')
+
+    except Exception as e:
+        conn.close()
+        return str(e)
+
+
+@app.route('/brand')
+def bard():
+    return render_template('brand.html')
 
 
 if __name__ == '__main__':

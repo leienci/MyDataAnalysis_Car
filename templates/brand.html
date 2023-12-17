@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>城市</title>
+    <title>品牌</title>
     <meta content="" name="descriptison">
     <meta content="" name="keywords">
 
@@ -27,8 +27,8 @@
 
     <!-- Template Main CSS File -->
     <link href="static/assets/css/style.css" rel="stylesheet">
-    <!-- 引入 Echarts 库 -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 </head>
 
@@ -59,7 +59,6 @@
 <!-- ======= Our Team Section ======= -->
 <section id="team" class="team">
     <div class="container">
-
         <div class="section-title">
             <h2>汽车之家二手车数据分析</h2>
             <p>应用Python爬虫/Flask框架/Echarts插件/WordCloud等技术实现</p>
@@ -67,45 +66,10 @@
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
             <!-- 图表容器 -->
-            <div id="city-chart" style="width: 100%; height: 500px;"></div>
-            <script>
-                // 获取从 Flask 传递过来的数据
-                var cityData = {{ city|tojson }};
-                var numData = {{ num|tojson }};
-
-                // 初始化图表容器
-                var chartContainer = document.getElementById('city-chart');
-                var chart = echarts.init(chartContainer);
-
-                // 配置图表
-                var options = {
-                    title: {
-                        text: '城市分布饼状图', // 图表标题
-                        left: 'center' // 标题位置
-                    },
-                    series: [{
-                        type: 'pie', // 图表类型为饼状图
-                        data: [],
-                        label: {
-                            formatter: '{b} ({d}%)' // 设置标签显示的格式为：城市名称 (百分比)
-                        }
-                    }],
-                    tooltip: {
-                        formatter: '{b}：<br/>{c}辆 ({d}%)' // 设置提示框显示的格式为：城市名称：<br/>数量辆 (百分比)
-                    }
-                };
-
-                // 根据数据动态生成图表配置
-                for (var i = 0; i < cityData.length; i++) {
-                    options.series[0].data.push({
-                        value: numData[i],
-                        name: cityData[i]
-                    });
-                }
-
-                // 渲染图表
-                chart.setOption(options);
-            </script>
+            <div id="city-chart" style="width: 100%; height: 100%;"></div>
+            <center>
+                <img src="/wordcloud" alt="Brand Word Cloud">
+            </center>
         </section><!-- End Counts Section -->
     </div>
 </section><!-- End Our Team Section -->
