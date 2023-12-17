@@ -115,9 +115,7 @@ def wordcloud():
     # 连接数据库
     conn = sqlite3.connect('che168.db')
     try:
-        # 创建游标
         cursor = conn.cursor()
-        # 执行查询
         cursor.execute("SELECT 品牌 FROM che168")
         results = cursor.fetchall()
         # 提取品牌名称列表
@@ -135,7 +133,7 @@ def wordcloud():
         image.save(img_byte, format='PNG')
         img_byte.seek(0)
         print('词云生成成功^_^')
-        # 关闭数据库连接
+
         conn.close()
         # 返回词云图像
         return send_file(img_byte, mimetype='image/png')
