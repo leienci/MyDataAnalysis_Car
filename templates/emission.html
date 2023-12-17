@@ -69,8 +69,6 @@
         <section class="counts section-bg">
             <!-- 折线图容器 -->
             <div id="chart" style="width: 100%; height: 400px;"></div>
-
-            <!-- JavaScript 代码 -->
             <script>
                 // 创建 ECharts 实例
                 var chart = echarts.init(document.getElementById('chart'));
@@ -79,29 +77,26 @@
                 var emission = {{ emission|tojson }};
                 var num = {{ num|tojson }};
 
-                // 定义折线图的配置项
+                // 定义标准条形图的配置项
                 var option = {
                     tooltip: {
                         trigger: 'axis',  // 鼠标悬停触发方式
                         formatter: '{b}: {c}'  // 鼠标悬停提示框的格式
                     },
                     xAxis: {
-                        type: 'category',
-                        data: emission,
-                        axisLabel: {
-                            rotate: 90, // 旋转角度，可以根据需要调整
-                        }
-                    },
-                    yAxis: {
                         type: 'value'
                     },
+                    yAxis: {
+                        type: 'category',
+                        data: emission,
+                    },
                     series: [{
-                        type: 'line',
+                        type: 'bar',
                         data: num
                     }]
                 };
 
-                // 使用配置项绘制折线图
+                // 使用配置项绘制标准条形图
                 chart.setOption(option);
             </script>
         </section><!-- End Counts Section -->
