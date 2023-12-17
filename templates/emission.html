@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>车辆级别</title>
+    <title>排放</title>
     <meta content="" name="descriptison">
     <meta content="" name="keywords">
 
@@ -47,15 +47,16 @@
             <ul>
                 <li><a href="/index">首页</a></li>
                 <li><a href="/car">二手车</a></li>
-                <li class="active"><a href="/level">车辆级别<i class="la la-angle-down"></i></a></li>
+                <li><a href="/level">车辆级别</a></li>
                 <li><a href="/city">城市</a></li>
                 <li><a href="/brand">品牌</a></li>
                 <li><a href="/gearbox">变速箱</a></li>
-                <li><a href="/emission">排放</a></li>
+                <li class="active"><a href="/emission">排放<i class="la la-angle-down"></i></a></li>
             </ul>
         </nav><!-- .nav-menu -->
     </div>
 </header><!-- End Header -->
+
 <!-- ======= Our Team Section ======= -->
 <section id="team" class="team">
     <div class="container">
@@ -64,21 +65,43 @@
             <h2>汽车之家二手车数据分析</h2>
             <p>应用Python爬虫/Flask框架/Echarts插件/WordCloud等技术实现</p>
         </div>
-
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
-            <!-- 创建一个具有指定 ID 的 DOM 元素作为图表的容器 -->
-            <div id="main" style="width: 100%;height:400px;"></div>
-            <!-- 在 JavaScript 中使用 Echarts 绘制图表 -->
-            <script>
-                // 获取传递给模板的数据
-                var level = {{ level | tojson }};
-                var num = {{ num | tojson }};
+            <!-- 折线图容器 -->
+            <div id="chart" style="width: 100%; height: 400px;"></div>
 
-                // 创建图表实例
+            <!-- JavaScript 代码 -->
+            <script>
+                // 创建 ECharts 实例
                 var chart = echarts.init(document.getElementById('chart'));
 
-                // 使用配置项显示图表
+                // 获取后端传递的数据
+                var emission = {{ emission|tojson }};
+                var num = {{ num|tojson }};
+
+                // 定义折线图的配置项
+                var option = {
+                    tooltip: {
+                        trigger: 'axis',  // 鼠标悬停触发方式
+                        formatter: '{b}: {c}'  // 鼠标悬停提示框的格式
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: emission,
+                        axisLabel: {
+                            rotate: 90, // 旋转角度，可以根据需要调整
+                        }
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        type: 'line',
+                        data: num
+                    }]
+                };
+
+                // 使用配置项绘制折线图
                 chart.setOption(option);
             </script>
         </section><!-- End Counts Section -->
@@ -88,9 +111,7 @@
 <!-- ======= Footer ======= -->
 <footer id="footer">
     <div class="container">
-        <div class="copyright">Copyright &copy; 2020.Company name All rights reserved.<a target="_blank"
-                                                                                         href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a>
-        </div>
+        <div class="copyright">Copyright &copy; 2020.Company name All rights reserved.</div>
         <div class="credits"></div>
     </div>
 </footer><!-- End Footer -->
@@ -112,48 +133,6 @@
 <!-- Template Main JS File -->
 <script src="static/assets/js/main.js"></script>
 
-<script type="text/javascript">
-    var chartDom = document.getElementById('main');
-    var myChart = echarts.init(chartDom);
-    var option;
-
-    option = {
-        color: ['#3398DB'],
-        title: {
-            text: ''
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'shadow',
-            }
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'category',
-            data: {{ level | tojson }},
-            axisLabel: {
-                rotate: 90, // 旋转角度，可以根据需要调整
-            }
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [
-            {
-                data: {{ num }},
-                type: 'bar',
-                barWidth: '60%'
-            }
-        ]
-    };
-    option && myChart.setOption(option);
-</script>
 </body>
 
 </html>

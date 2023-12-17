@@ -150,6 +150,7 @@ def bard():
     return render_template('brand.html')
 
 
+# 变速箱页面
 @app.route('/gearbox')
 def gearbox():
     gearbox = []  # 车辆变速箱
@@ -166,6 +167,24 @@ def gearbox():
     cur.close()
     con.close()
     return render_template('gearbox.html', gearbox=gearbox, num=num)
+
+
+# 排放标准页面
+@app.route('/emission')
+def emission():
+    emission = []  # 排放标准
+    num = []  # 车辆数量
+    con = sqlite3.connect("che168.db")
+    cur = con.cursor()
+    # 查询每个标准的车辆数量
+    sql = "SELECT 排放标准, COUNT(排放标准) FROM che168 WHERE 排放标准 != 'None' GROUP BY 排放标准"
+    data = cur.execute(sql)
+    for item in data:
+        emission.append(str(item[0]))
+        num.append(item[1])
+    cur.close()
+    con.close()
+    return render_template('emission.html', emission=emission, num=num)
 
 
 if __name__ == '__main__':
