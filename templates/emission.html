@@ -68,7 +68,7 @@
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
             <!-- 折线图容器 -->
-            <div id="chart" style="width: 100%; height: 400px;"></div>
+            <div id="chart" style="width: 100%; height: 500px;"></div>
             <script>
                 // 创建 ECharts 实例
                 var chart = echarts.init(document.getElementById('chart'));
@@ -92,7 +92,11 @@
                     },
                     series: [{
                         type: 'bar',
-                        data: num
+                        data: num,
+                        label: {
+                            show: true, // 显示数值
+                            position: 'right' // 数值显示在条形内部
+                        }
                     }]
                 };
 
