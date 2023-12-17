@@ -81,12 +81,13 @@
                 // 配置图表
                 var options = {
                     title: {
-                        text: '城市分布饼状图', // 图表标题
+                        text: '城市分布环形图', // 图表标题
                         left: 'center' // 标题位置
                     },
                     series: [{
                         type: 'pie', // 图表类型为饼状图
                         data: [],
+                        radius: ['50%', '70%'], // 设置内半径和外半径的百分比
                         label: {
                             formatter: '{b} ({d}%)' // 设置标签显示的格式为：城市名称 (百分比)
                         }
