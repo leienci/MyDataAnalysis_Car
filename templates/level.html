@@ -53,6 +53,7 @@
                 <li><a href="/gearbox">变速箱</a></li>
                 <li><a href="/emission">排放</a></li>
                 <li><a href="/price">售价</a></li>
+                <li><a href="/drive">驱动方式</a></li>
             </ul>
         </nav><!-- .nav-menu -->
     </div>
@@ -119,6 +120,15 @@
     var option;
 
     option = {
+        toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
         color: ['#3398DB'],
         title: {
             text: '车辆级别统计柱状图'

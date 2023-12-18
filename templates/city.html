@@ -53,6 +53,7 @@
                 <li><a href="/gearbox">变速箱</a></li>
                 <li><a href="/emission">排放</a></li>
                 <li><a href="/price">售价</a></li>
+                <li><a href="/drive">驱动方式</a></li>
             </ul>
         </nav><!-- .nav-menu -->
     </div>
@@ -81,6 +82,15 @@
 
                 // 配置图表
                 var options = {
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            mark: {show: true},
+                            dataView: {show: true, readOnly: false},
+                            restore: {show: true},
+                            saveAsImage: {show: true}
+                        }
+                    },
                     title: {
                         text: '城市分布环形图', // 图表标题
                         left: 'center' // 标题位置

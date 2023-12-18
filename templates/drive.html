@@ -52,7 +52,8 @@
                 <li><a href="/brand">品牌</a></li>
                 <li><a href="/gearbox">变速箱</a></li>
                 <li><a href="/emission">排放</a></li>
-                <li class="active"><a href="/price">售价<i class="la la-angle-down"></i></a></li>
+                <li><a href="/price">售价</a></li>
+                <li class="active"><a href="/drive">驱动方式<i class="la la-angle-down"></i></a></li>
             </ul>
         </nav><!-- .nav-menu -->
     </div>
@@ -81,6 +82,10 @@
                         // 使用ECharts绘制半环形图
                         var chart = echarts.init(document.getElementById('drive-chart'));
                         var option = {
+                            title: {
+                                text: '驱动方式玫瑰图', // 设置图表标题
+                                left: 'center' // 标题居中显示
+                            },
                             legend: {
                                 top: 'bottom'
                             },
@@ -93,6 +98,10 @@
                                     saveAsImage: {show: true}
                                 }
                             },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: '{b}: {c} ({d}%)' // 鼠标悬停时显示的格式，包括品牌名、数量和百分比
+                            },
                             series: [
                                 {
                                     name: 'Nightingale Chart',
@@ -102,6 +111,11 @@
                                     roseType: 'area',
                                     itemStyle: {
                                         borderRadius: 8
+                                    },
+                                    label: {
+                                        show: true,
+                                        position: 'outside', // 数值显示在扇形外部
+                                        formatter: '{b} {d}%' // 格式化显示内容，包括品牌名和百分比
                                     },
                                     data: data.brand.map((brand, index) => ({name: brand, value: data.count[index]}))
                                 }
