@@ -1,4 +1,4 @@
-from flask import request, send_file, jsonify
+from flask import request, send_file, jsonify, redirect, url_for
 from flask import Flask
 from flask import render_template
 from wordcloud import WordCloud
@@ -17,6 +17,13 @@ def minus(value, arg):
 @app.template_filter()
 def plus(value, arg):
     return value + arg
+
+
+# 重定向到首页
+@app.route('/')
+def req():
+    # 使用 redirect 函数将请求重定向到 home 路由
+    return redirect(url_for('home'))
 
 
 # 主页
