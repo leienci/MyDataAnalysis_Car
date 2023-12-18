@@ -215,5 +215,29 @@ def price():
     return render_template('price.html')
 
 
+@app.route('/get_drive_data')
+def get_brand_data():
+    con = sqlite3.connect("che168.db")
+    cur = con.cursor()
+    # 查询驱动方式数量
+    sql = "select 驱动方式, count(驱动方式) from che168 where 驱动方式 != 'None' group by 驱动方式"
+    data = cur.execute(sql).fetchall()
+    # 关闭连接
+    con.close()
+
+    # 处理数据，准备绘图所需的格式
+    brand = [item[0] for item in data]
+    count = [item[1] for item in data]
+    print(data)
+    # 将数据转换为 JSON 格式并返回
+    return jsonify({'brand': brand, 'count': count})
+
+
+# 定义一个路由，用于显示包含 ECharts 的页面
+@app.route('/drive')
+def drive():
+    return render_template('drive.html')
+
+
 if __name__ == '__main__':
     app.run()
