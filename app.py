@@ -192,8 +192,12 @@ def bard():
 def gearbox():
     gearbox = []  # 车辆变速箱
     num = []  # 每一个等级对应的车辆数量
+    brands = []  # 手动挡品牌
+    counts = []  # 每个品牌的数量
+
     con = sqlite3.connect("che168.db")
     cur = con.cursor()
+
     # 查询每个城市的车辆数量
     sql = "select 变速箱, count(变速箱) from che168 where 变速箱 != 'None' group by 变速箱"
     data = cur.execute(sql)
@@ -201,9 +205,20 @@ def gearbox():
         gearbox.append(str(item[0]))
         num.append(item[1])
         print(gearbox, num)
+
+        # 查询手动挡品牌数量
+    sql = "SELECT 品牌, COUNT(*) FROM che168 WHERE 变速箱 = '手动' AND 品牌 IS NOT NULL GROUP BY 品牌"
+    data = cur.execute(sql).fetchall()
+
+    # 处理数据
+    for item in data:
+        brands.append(item[0])
+        counts.append(item[1])
+
     cur.close()
     con.close()
-    return render_template('gearbox.html', gearbox=gearbox, num=num)
+    print(brands, counts)
+    return render_template('gearbox.html', gearbox=gearbox, num=num, brands=brands, counts=counts)
 
 
 # 排放标准页面
