@@ -224,6 +224,8 @@ def gearbox():
 # 排放标准页面
 @app.route('/emission')
 def emission():
+    fuel = []  # 燃油标号
+    count = []  # 燃油标号统计
     emission = []  # 排放标准
     num = []  # 车辆数量
     con = sqlite3.connect("che168.db")
@@ -234,9 +236,16 @@ def emission():
     for item in data:
         emission.append(str(item[0]))
         num.append(item[1])
+    print(emission, num)
+    sql = "select 燃油标号, count(燃油标号) from che168 where 燃油标号 != 'None' group by 燃油标号"
+    data = cur.execute(sql)
+    for item in data:
+        fuel.append(str(item[0]))
+        count.append(item[1])
+    print(fuel, count)
     cur.close()
     con.close()
-    return render_template('emission.html', emission=emission, num=num)
+    return render_template('emission.html', emission=emission, num=num, fuel=fuel, count=count)
 
 
 # 价格折线图

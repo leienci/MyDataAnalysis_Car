@@ -117,6 +117,87 @@
                 // 使用配置项绘制标准条形图
                 chart.setOption(option);
             </script>
+            <div id="fuel-chart" style="width: 100%; height: 500px;"></div>
+            <!-- 在JavaScript中使用ECharts绘制燃油标号漏斗图 -->
+            <!-- 在JavaScript中使用ECharts绘制燃油标号漏斗图 -->
+            <script>
+                // 数据
+                var fuel = {{ fuel|tojson }};
+                var count = {{ count|tojson }};
+
+                // 初始化 ECharts 实例
+                var fuelChart = echarts.init(document.getElementById('fuel-chart'));
+
+                // 计算总数
+                var totalCount = count.reduce(function (prev, cur) {
+                    return prev + cur;
+                }, 0);
+
+                // 配置图表
+                var fuelOption = {
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            mark: {show: true},
+                            dataView: {show: true, readOnly: false},
+                            restore: {show: true},
+                            saveAsImage: {show: true},
+                        },
+                        top: '5%', // 工具箱距离容器顶部的距离
+                        right: '5%', // 工具箱距离容器右侧的距离
+                    },
+                    title: {
+                        text: '车辆燃油标号统计',
+                        textStyle: {
+                            fontSize: 16, // 标题字体大小
+                            color: '#333', // 标题颜色
+                        },
+                        left: 'center',
+                        top: '5%',
+                    },
+                    series: [{
+                        name: '车辆数量',
+                        type: 'funnel',  // 将图表类型改为'funnel'
+                        width: '60%',  // 漏斗图的宽度
+                        height: '70%',  // 漏斗图的高度
+                        left: 'center',  // 漏斗图的水平位置
+                        top: '20%',  // 漏斗图的垂直位置
+                        sort: 'descending',  // 数据排序方式，此处为降序
+                        label: {
+                            show: true,
+                            position: 'inside',  // 标签位置设置为内部
+                            formatter: '{b} : {c} ({d}%)',  // 标签内容，显示数据项的名称、值和占比
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: '20',
+                                fontWeight: 'bold',
+                            },
+                        },
+                        labelLine: {
+                            show: false,  // 标签的连接线不显示
+                        },
+                        data: count.map(function (value, index) {
+                            var percentage = ((value / totalCount) * 100).toFixed(2);
+                            return {
+                                value: value,
+                                name: fuel[index],
+                                label: {formatter: '{b} : {c} (' + percentage + '%)'}
+                            };
+                        }),
+                        itemStyle: {
+                            color: function (params) {
+                                // 设置每个漏斗图块的颜色
+                                var colorList = ['#FF9999', '#66B2FF', '#99FF99', '#FFCC99'];
+                                return colorList[params.dataIndex];
+                            },
+                        },
+                    }],
+                };
+
+                fuelChart.setOption(fuelOption);
+            </script>
         </section><!-- End Counts Section -->
     </div>
 </section><!-- End Our Team Section -->
