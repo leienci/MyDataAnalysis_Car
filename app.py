@@ -232,7 +232,27 @@ def get_price_data():
     cursor = conn.cursor()
 
     # 执行查询并统计不同价格区间车辆的数量
-    sql = "SELECT CASE WHEN 售价 BETWEEN 0 AND 1 THEN '0-1' WHEN 售价 BETWEEN 1 AND 10 THEN '1-10' WHEN 售价 BETWEEN 11 AND 20 THEN '11-20' WHEN 售价 BETWEEN 21 AND 30 THEN '21-30' WHEN 售价 BETWEEN 31 AND 50 THEN '31-50' WHEN 售价 BETWEEN 51 AND 70 THEN '51-70' WHEN 售价 BETWEEN 71 AND 98 THEN '71-99' ELSE '100+' END AS 价格区间, COUNT(*) AS 数量 FROM che168 WHERE 售价 IS NOT NULL GROUP BY 价格区间 ORDER BY MIN(售价)"
+    sql = """SELECT
+                CASE
+                    WHEN 售价 BETWEEN 0 AND 1 THEN '0-1'
+                    WHEN 售价 BETWEEN 1 AND 10 THEN '1-10'
+                    WHEN 售价 BETWEEN 11 AND 20 THEN '11-20'
+                    WHEN 售价 BETWEEN 21 AND 30 THEN '21-30'
+                    WHEN 售价 BETWEEN 31 AND 50 THEN '31-50'
+                    WHEN 售价 BETWEEN 51 AND 70 THEN '51-70'
+                    WHEN 售价 BETWEEN 71 AND 98 THEN '71-99'
+                    ELSE '100+'
+                END AS 价格区间,
+                COUNT(*) AS 数量
+            FROM
+                che168
+            WHERE
+                售价 IS NOT NULL
+            GROUP BY
+                价格区间
+            ORDER BY
+                MIN(售价)
+"""
     data = cursor.execute(sql).fetchall()
 
     # 关闭连接
@@ -247,7 +267,56 @@ def get_price_data():
 
 
 # 价格最高的15辆车
+@app.route('/get_top_prices_data')
+def get_top_prices_data():
+    con = sqlite3.connect("che168.db")  # 替换为实际的数据库文件路径
+    cur = con.cursor()
+
+    sql = """
+        SELECT 车名, 售价
+        FROM che168
+        WHERE 售价 IS NOT NULL
+        ORDER BY 售价 DESC
+        LIMIT 15;
+    """
+
+    data = cur.execute(sql).fetchall()
+    cur.close()
+    con.close()
+
+    # 处理数据，准备绘图所需的格式
+    name = [item[0] for item in data]
+    price = [item[1] for item in data]
+
+    # 将数据转换为 JSON 格式并返回
+    return jsonify({'name': name, 'price': price})
+
+
 # 价格最低的15辆车
+@app.route('/get_lowest_prices_data')
+def get_lowest_prices_data():
+    con = sqlite3.connect("che168.db")  # 替换为实际的数据库文件路径
+    cur = con.cursor()
+
+    sql = """
+        SELECT 车名, 售价
+        FROM che168
+        WHERE 售价 IS NOT NULL
+        ORDER BY 售价 ASC  -- 升序排列
+        LIMIT 15;
+    """
+
+    data = cur.execute(sql).fetchall()
+    cur.close()
+    con.close()
+
+    # 处理数据，准备绘图所需的格式
+    name = [item[0] for item in data]
+    price = [item[1] for item in data]
+
+    # 将数据转换为 JSON 格式并返回
+    return jsonify({'name': name, 'price': price})
+
 
 # 定义一个路由，用于显示包含 ECharts 的页面
 @app.route('/price')
