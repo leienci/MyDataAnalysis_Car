@@ -151,6 +151,36 @@ def wordcloud():
         return str(e)
 
 
+# 车辆数量最多的前十个品牌
+@app.route('/get_top_brands_data')
+def get_top_brands_data():
+    con = sqlite3.connect("che168.db")  # 替换为实际的数据库文件路径
+    cur = con.cursor()
+
+    sql = """
+        SELECT 品牌, COUNT(*) as 车辆数量
+        FROM che168
+        WHERE 品牌 IS NOT NULL
+        GROUP BY 品牌
+        ORDER BY 车辆数量 DESC
+        LIMIT 10;
+    """
+
+    data = cur.execute(sql).fetchall()
+    cur.close()
+    con.close()
+
+    # 处理数据，准备绘图所需的格式
+    brand = [item[0] for item in data]
+    count = [item[1] for item in data]
+
+    print('Brand:', brand)
+    print('Count:', count)
+
+    # 将数据转换为 JSON 格式并返回
+    return jsonify({'brand': brand, 'count': count})
+
+
 # 品牌词云页面
 @app.route('/brand')
 def bard():
@@ -215,6 +245,9 @@ def get_price_data():
     # 将数据转换为 JSON 格式并返回
     return jsonify({'price_ranges': price_ranges, 'quantities': quantities})
 
+
+# 价格最高的15辆车
+# 价格最低的15辆车
 
 # 定义一个路由，用于显示包含 ECharts 的页面
 @app.route('/price')

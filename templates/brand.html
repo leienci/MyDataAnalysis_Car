@@ -29,6 +29,8 @@
     <link href="static/assets/css/style.css" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- 引入 ECharts 库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.0.2/dist/echarts.min.js"></script>
 
 </head>
 
@@ -68,8 +70,63 @@
         </div>
         <!-- ======= Counts Section ======= -->
         <section class="counts section-bg">
+            <!-- 在 JavaScript 中使用 ECharts 绘制条形图 -->
+            <!-- 渲染图表的容器 -->
+            <div id="bar-chart" style="width: 100%; height: 400px;"></div>
+            <!-- 在 JavaScript 中使用 ECharts 绘制条形图 -->
+            <script>
+                // 发送 AJAX 请求获取数据
+                fetch('/get_top_brands_data')
+                    .then(response => response.json())
+                    .then(data => {
+                        // 初始化 ECharts 实例
+                        var chart = echarts.init(document.getElementById('bar-chart'));
+
+                        // 配置图表
+                        var option = {
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    mark: {show: true},
+                                    dataView: {show: true, readOnly: false},
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            title: {
+                                text: '数量最多的品牌Top10'
+                            },
+                            xAxis: {
+                                type: 'value'  // 将 x 轴的类型改为 value
+                            },
+                            yAxis: {
+                                type: 'category',  // 将 y 轴的类型改为 category
+                                data: data.brand
+                            },
+                            series: [{
+                                name: 'Vehicle Count',
+                                type: 'bar',
+                                data: data.count,
+                                label: {
+                                    show: true,  // 显示标签
+                                    position: 'right',  // 标签位置，可以根据需要调整
+                                    formatter: '{c}'  // 标签内容，这里显示数据项的值
+                                }
+                            }],
+                            tooltip: {
+                                show: true,  // 显示提示框
+                                trigger: 'item',  // 触发类型，鼠标悬停时触发
+                                formatter: '{b}: {c}'  // 提示框内容，这里显示数据项的名称和值
+                            }
+                        };
+
+                        // 使用配置项设置图表
+                        chart.setOption(option);
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            </script>
             <!-- 图表容器 -->
-            <div id="city-chart" style="width: 100%; height: 100%;"></div>
+            <div id="city-chart" style="width: 80%; height: 100%;"></div>
             <center>
                 <img src="/wordcloud" alt="Brand Word Cloud">
             </center>
