@@ -111,7 +111,7 @@ def city():
     for item in data:
         city.append(str(item[0]))
         num.append(item[1])
-        print(city, num)
+    print(city, num)
     cur.close()
     con.close()
     return render_template('city.html', city=city, num=num)
@@ -204,9 +204,10 @@ def gearbox():
     for item in data:
         gearbox.append(str(item[0]))
         num.append(item[1])
-        print(gearbox, num)
 
-        # 查询手动挡品牌数量
+    print(gearbox, num)
+
+    # 查询手动挡品牌数量
     sql = "SELECT 品牌, COUNT(*) FROM che168 WHERE 变速箱 = '手动' AND 品牌 IS NOT NULL GROUP BY 品牌"
     data = cur.execute(sql).fetchall()
 
@@ -285,7 +286,7 @@ def get_price_data():
     # 处理数据，准备绘图所需的格式
     price_ranges = [item[0] for item in data]
     quantities = [item[1] for item in data]
-
+    print(price_ranges, quantities)
     # 将数据转换为 JSON 格式并返回
     return jsonify({'price_ranges': price_ranges, 'quantities': quantities})
 
